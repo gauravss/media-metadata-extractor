@@ -53,6 +53,12 @@ This should display the installed version number of ExifTool.
 
 ## Usage
 
+Before running the script, you may need to make it executable:
+
+```bash
+chmod +x create_audio_report_simple.sh
+```
+
 The script requires two arguments: the path to the source folder containing the audio files and the path for the output CSV file.
 
 ### Syntax
