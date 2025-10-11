@@ -54,8 +54,8 @@ echo "Scanning for audio files in '$SOURCE_FOLDER' and extracting metadata..."
 
 temp_file=$(mktemp)
 
-# Use exiftool to extract metadata from the source folder for various audio formats.
-exiftool -m -r -ext mp3 -ext m4a -ext amr -ext wav -p '$FileName|$Directory|$FileSize#|$Album|$Year|$CreateDate|$Duration|$Artist|$Title|$Genre|$Comment' "$SOURCE_FOLDER" > "$temp_file"
+# Use exiftool to extract metadata, cleaning up the Comment field.
+exiftool -m -r -ext mp3 -ext m4a -ext amr -ext wav -p '$FileName|$Directory|$FileSize#|$Album|$Year|$CreateDate|$Duration|$Artist|$Title|$Genre|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$SOURCE_FOLDER" > "$temp_file"
 
 # Use awk to process the metadata and create the final CSV.
 awk -v source_folder="$SOURCE_FOLDER" \
@@ -65,7 +65,7 @@ awk -v source_folder="$SOURCE_FOLDER" \
 }
 {
     # Make the file path relative to the source folder
-    sub(source_folder, "", $2);
+    sub(source_folder, "", $2)
 
     # Album logic
     album = $4
@@ -95,10 +95,10 @@ awk -v source_folder="$SOURCE_FOLDER" \
     }
 
     # Size
-    size_mb = $3 / (1024*1024);
+    size_mb = $3 / (1024*1024)
 
     # Print CSV line, with all text fields wrapped in double quotes.
-    printf("\"%s\",\"%s\",%.2f,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", $1, $2, size_mb, album, year, $7, $8, $9, $10, $11);
+    printf("\"%s\",\"%s\",%.2f,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", $1, $2, size_mb, album, year, $7, $8, $9, $10, $11)
 
 }' "$temp_file" > "$TARGET_CSV"
 
