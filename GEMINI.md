@@ -8,9 +8,9 @@ The primary goal of this script is to provide a simple and effective way to cata
 
 ### Key Technologies
 
-*   **Shell Scripting (`bash`)**: The core logic is written as a `bash` script, making it portable across Unix-like systems (Linux, macOS).
-*   **`exiftool`**: This is a critical dependency for reading and extracting metadata from the audio files.
-*   **`awk`**: Used for processing the extracted metadata and formatting it into a CSV structure.
+* **Shell Scripting (`bash`)**: The core logic is written as a `bash` script, making it portable across Unix-like systems (Linux, macOS).
+* **`exiftool`**: This is a critical dependency for reading and extracting metadata from the audio files.
+* **`awk`**: Used for processing the extracted metadata and formatting it into a CSV structure.
 
 ## Building and Running
 
@@ -18,7 +18,7 @@ This project does not require a build process. It can be run directly from the c
 
 ### Prerequisites
 
-*   **`exiftool`**: You must have `exiftool` installed and available in your system's PATH. Instructions for installation are in the `README.md` file.
+* **`exiftool`**: You must have `exiftool` installed and available in your system's PATH. Instructions for installation are in the `README.md` file.
 
 ### Running the Script
 
@@ -40,7 +40,7 @@ This command will scan the `~/Music/Podcasts` directory for audio files and crea
 
 ## Development Conventions
 
-*   The script is written in `bash` and should be compatible with standard `bash` environments.
-*   The script follows a simple procedural style.
-*   Error handling is included for missing dependencies and incorrect arguments.
-*   A temporary file is used to stage the `exiftool` output before it's processed by `awk`, which is a good practice for managing intermediate data.
+* The script is written in `bash` and should be compatible with standard `bash` environments.
+* The script follows a simple procedural style.
+* Error handling is included for missing dependencies and incorrect arguments.
+* A temporary file is used to stage the `exiftool` output before it's processed by `awk`, which is a good practice for managing intermediate data.
