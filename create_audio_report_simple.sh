@@ -55,7 +55,14 @@ echo "Scanning for audio files in '$SOURCE_FOLDER' and extracting metadata..."
 temp_file=$(mktemp)
 
 # Use exiftool to extract metadata, cleaning up the Comment field.
-exiftool -m -r -ext mp3 -ext m4a -ext amr -ext wav -p '$FileName|$Directory|$FileSize#|$Album|$Year|$CreateDate|$Duration|$Artist|$Title|$Genre|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$SOURCE_FOLDER" > "$temp_file"
+exiftool -m -r -charset UTF8 -ext mp3 -ext m4a -ext amr -ext wav -p '$FileName|$Directory|$FileSize#|$Album|$Year|$CreateDate|$Duration|$Artist|$Title|$Genre|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$SOURCE_FOLDER" > "$temp_file"
+
+# Check if exiftool command was successful
+if [ $? -ne 0 ]; then
+    echo "Error: exiftool command failed. Aborting."
+    rm "$temp_file"
+    exit 1
+fi
 
 # Use awk to process the metadata and create the final CSV.
 awk -v source_folder="$SOURCE_FOLDER" \
