@@ -75,7 +75,11 @@ fi
 
 # Use awk to process the metadata and create the final CSV.
 awk -v source_folder="$SOURCE_FOLDER" \
-'BEGIN {
+'function escape(str) {
+    gsub(/"/, "\"\"", str)
+    return str
+}
+BEGIN {
     FS="|";
     print "File Name,File Path,Size (MB),Album,Year,Duration,Artist,Title,Genre,Comment,Checksum";
 }
@@ -114,7 +118,7 @@ awk -v source_folder="$SOURCE_FOLDER" \
     size_mb = $3 / (1024*1024)
 
     # Print CSV line, with all text fields wrapped in double quotes.
-    printf("\"%s\",\"%s\",%.2f,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", $1, $2, size_mb, album, year, $7, $8, $9, $10, $11, $12)
+    printf("\"%s\",\"%s\",%.2f,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", escape($1), escape($2), size_mb, escape(album), escape(year), $7, escape($8), escape($9), escape($10), escape($11), $12)
 
 }' "$temp_file" > "$TARGET_CSV"
 
