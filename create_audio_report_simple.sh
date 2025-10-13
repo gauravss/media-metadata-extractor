@@ -55,7 +55,7 @@ echo "Scanning for audio files in '$SOURCE_FOLDER' and extracting metadata..."
 temp_file=$(mktemp)
 
 # Use exiftool to extract metadata, cleaning up the Comment field.
-exiftool -m -r -charset UTF8 -ext mp3 -ext m4a -ext amr -ext wav -p '$FileName|$Directory|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$SOURCE_FOLDER" > "$temp_file"
+exiftool -m -r -charset UTF8 -filemd5 -ext mp3 -ext m4a -ext amr -ext wav -p '$FileName|$Directory|$FileSize#|${FileMD5}|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$SOURCE_FOLDER" > "$temp_file"
 
 # Check if exiftool command was successful
 if [ $? -ne 0 ]; then
@@ -68,14 +68,14 @@ fi
 awk -v source_folder="$SOURCE_FOLDER" \
 'BEGIN {
     FS="|";
-    print "File Name,File Path,Size (MB),Album,Year,Duration,Artist,Title,Genre,Comment";
+    print "File Name,File Path,Size (MB),Checksum,Album,Year,Duration,Artist,Title,Genre,Comment";
 }
 {
     # Make the file path relative to the source folder
     sub(source_folder, "", $2)
 
     # Album logic
-    album = $4
+    album = $5
     if (album == "") {
         # Get folder name from directory path
         split($2, parts, "/")
@@ -86,11 +86,11 @@ awk -v source_folder="$SOURCE_FOLDER" \
     }
 
     # Year logic
-    year = $5
+    year = $6
     if (year == "" || year !~ /^[0-9]{4}$/) {
         # Get year from creation date if year tag is invalid
-        if ($6 ~ /^[0-9]{4}/) {
-            year = substr($6, 1, 4)
+        if ($7 ~ /^[0-9]{4}/) {
+            year = substr($7, 1, 4)
         } else {
             year = "N/A"
         }
@@ -105,7 +105,7 @@ awk -v source_folder="$SOURCE_FOLDER" \
     size_mb = $3 / (1024*1024)
 
     # Print CSV line, with all text fields wrapped in double quotes.
-    printf("\"%s\",\"%s\",%.2f,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", $1, $2, size_mb, album, year, $7, $8, $9, $10, $11)
+    printf("\"%s\",\"%s\",%.2f,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", $1, $2, size_mb, $4, album, year, $8, $9, $10, $11, $12)
 
 }' "$temp_file" > "$TARGET_CSV"
 
