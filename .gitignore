@@ -26,3 +26,5 @@ venv/
 *.so
 *.dylib
 *.o
+.gemini/
+gha-creds-*.json
