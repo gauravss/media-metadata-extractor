@@ -11,6 +11,7 @@ The primary goal of this script is to provide a simple and effective way to cata
 * **Shell Scripting (`bash`)**: The core logic is written as a `bash` script, making it portable across Unix-like systems (Linux, macOS).
 * **`exiftool`**: This is a critical dependency for reading and extracting metadata from the audio files.
 * **`awk`**: Used for processing the extracted metadata and formatting it into a CSV structure.
+* **`md5`**: Used for calculating the MD5 checksum of each audio file.
 
 ## Building and Running
 
@@ -41,9 +42,9 @@ This command will scan the `~/Music/Podcasts` directory for audio files and crea
 ## Development Conventions
 
 * The script is written in `bash` and should be compatible with standard `bash` environments.
-* The script follows a simple procedural style.
-* Error handling is included for missing dependencies, incorrect arguments, and `exiftool` command failures.
-* A temporary file is used to stage the `exiftool` output before it's processed by `awk`, which is a good practice for managing intermediate data.
+* The script now loops through each audio file individually to calculate the checksum and extract metadata. This approach is more robust, but may be slower on very large collections.
+* Error handling is included for missing dependencies and incorrect arguments.
+* A temporary file is used to stage the extracted data before it's processed by `awk`, which is a good practice for managing intermediate data.
 
 ## Data Handling and CSV Generation
 
