@@ -85,7 +85,11 @@ awk -v source_folder="$SOURCE_FOLDER" \
         }
     }
 
-    # Year logic
+    # Make the file path relative to the source folder by removing the prefix.
+    # Using index() for a literal match to avoid regex issues with folder names.
+    if (index($2, source_folder) == 1) {
+        $2 = substr($2, length(source_folder) + 1)
+    }
     year = $6
     if (year == "" || year !~ /^[0-9]{4}$/) {
         # Get year from creation date if year tag is invalid
