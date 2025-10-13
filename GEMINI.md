@@ -4,7 +4,7 @@
 
 This project consists of a single shell script, `create_audio_report_simple.sh`, designed to extract metadata from audio files within a specified directory. It leverages the powerful `exiftool` command-line utility to read metadata from various audio formats (including `mp3`, `m4a`, `amr`, and `wav`) and generates a comprehensive CSV report.
 
-The primary goal of this script is to provide a simple and effective way to catalog and manage large audio collections by extracting key information such as Title, Artist, Album, Year, and more.
+The primary goal of this script is to provide a simple and effective way to catalog and manage large audio collections by extracting key information such as Title, Artist, Album, Year, Checksum, and more.
 
 ### Key Technologies
 

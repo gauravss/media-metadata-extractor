@@ -11,6 +11,7 @@ The script extracts the following metadata fields:
 - File Name
 - File Path
 - Size (in MB)
+- Checksum
 - Album
 - Year
 - Duration
@@ -106,6 +107,7 @@ The script will generate a CSV file with the specified name and at the specified
 - `File Name`
 - `File Path`
 - `Size (MB)`
+- `Checksum`
 - `Album`
 - `Year`
 - `Duration`
