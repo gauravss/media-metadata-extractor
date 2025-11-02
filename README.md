@@ -18,6 +18,7 @@ The script extracts the following metadata fields:
 - Title
 - Genre
 - Comment
+- Checksum
 
 ## Prerequisites
 
@@ -113,3 +114,4 @@ The script will generate a CSV file with the specified name and at the specified
 - `Title`
 - `Genre`
 - `Comment`
+- `Checksum`

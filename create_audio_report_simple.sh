@@ -53,22 +53,36 @@ fi
 echo "Scanning for audio files in '$SOURCE_FOLDER' and extracting metadata..."
 
 temp_file=$(mktemp)
+temp_file=$(mktemp)
+trap 'rm -f "$temp_file"' EXIT
+# Find all audio files and loop through them
+find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" \) | while read -r file; do
+    # Calculate MD5 checksum
+    md5_checksum=$(md5 -q "$file")
 
-# Use exiftool to extract metadata, cleaning up the Comment field.
-exiftool -m -r -charset UTF8 -ext mp3 -ext m4a -ext amr -ext wav -p '$FileName|$Directory|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$SOURCE_FOLDER" > "$temp_file"
+    # Extract metadata with exiftool
+    exiftool_output=$(exiftool -m -charset UTF8 -p '$FileName|$Directory|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$file")
 
-# Check if exiftool command was successful
-if [ $? -ne 0 ]; then
-    echo "Error: exiftool command failed. Aborting."
+    # Combine and write to temp file
+    echo "$exiftool_output|$md5_checksum" >> "$temp_file"
+done
+
+# Check if any files were found and processed
+if [ ! -s "$temp_file" ]; then
+    echo "No audio files found in the source folder."
     rm "$temp_file"
-    exit 1
+    exit 0
 fi
 
 # Use awk to process the metadata and create the final CSV.
 awk -v source_folder="$SOURCE_FOLDER" \
-'BEGIN {
+'function escape(str) {
+    gsub(/"/, "\"\"", str)
+    return str
+}
+BEGIN {
     FS="|";
-    print "File Name,File Path,Size (MB),Album,Year,Duration,Artist,Title,Genre,Comment";
+    print "File Name,File Path,Size (MB),Album,Year,Duration,Artist,Title,Genre,Comment,Checksum";
 }
 {
     # Make the file path relative to the source folder
@@ -105,7 +119,7 @@ awk -v source_folder="$SOURCE_FOLDER" \
     size_mb = $3 / (1024*1024)
 
     # Print CSV line, with all text fields wrapped in double quotes.
-    printf("\"%s\",\"%s\",%.2f,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", $1, $2, size_mb, album, year, $7, $8, $9, $10, $11)
+    printf("\"%s\",\"%s\",%.2f,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", escape($1), escape($2), size_mb, escape(album), escape(year), $7, escape($8), escape($9), escape($10), escape($11), $12)
 
 }' "$temp_file" > "$TARGET_CSV"
 
