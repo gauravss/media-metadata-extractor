@@ -69,14 +69,25 @@ else
     md5cmd() { md5sum "$1" | awk '{print $1}'; }
 fi
 
+# Pre-count total files for progress reporting
+total=$(find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" \) | wc -l | tr -d ' ')
+echo "Found $total audio file(s). Processing..."
+
+count=0
+skipped=0
+
 # Find all audio files and loop through them (null-delimited to handle filenames with spaces/newlines)
 while IFS= read -r -d '' file; do
+    count=$((count + 1))
+    echo "Processing $count/$total: $(basename "$file")" >&2
+
     # Calculate MD5 checksum
     md5_checksum=$(md5cmd "$file")
 
     # Extract metadata with exiftool
     if ! exiftool_output=$(exiftool -m -charset UTF8 -p '$FileName|$Directory|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$file" 2>/dev/null); then
         echo "Warning: skipping '$file' — exiftool failed to read metadata." >&2
+        skipped=$((skipped + 1))
         continue
     fi
 
@@ -142,4 +153,5 @@ BEGIN {
 
 rm "$temp_file"
 
-echo "Metadata extraction complete. The data is saved in '$TARGET_CSV'"
+processed=$((total - skipped))
+echo "Done. $processed/$total file(s) processed. CSV saved to '$TARGET_CSV'"
