@@ -7,7 +7,7 @@
 display_help() {
     echo "Usage: $0 <source_folder> <target_csv_file>"
     echo
-    echo "This script scans a source folder for audio files (mp3, m4a, amr, wav), extracts their metadata using exiftool,"
+    echo "This script scans a source folder for audio files (mp3, m4a, amr, wav, flac, ogg, opus, aac, wma), extracts their metadata using exiftool,"
     echo "and generates a CSV file with the collected information."
     echo
     echo "Arguments:"
@@ -70,7 +70,7 @@ else
 fi
 
 # Pre-count total files for progress reporting
-total=$(find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" \) | wc -l | tr -d ' ')
+total=$(find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" -o -iname "*.flac" -o -iname "*.ogg" -o -iname "*.opus" -o -iname "*.aac" -o -iname "*.wma" \) | wc -l | tr -d ' ')
 echo "Found $total audio file(s). Processing..."
 
 count=0
@@ -93,7 +93,7 @@ while IFS= read -r -d '' file; do
 
     # Combine and write to temp file
     echo "$exiftool_output|$md5_checksum" >> "$temp_file"
-done < <(find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" \) -print0)
+done < <(find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" -o -iname "*.flac" -o -iname "*.ogg" -o -iname "*.opus" -o -iname "*.aac" -o -iname "*.wma" \) -print0)
 
 # Check if any files were found and processed
 if [ ! -s "$temp_file" ]; then
