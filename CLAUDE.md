@@ -4,13 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a single-file bash utility (`create_audio_report_simple.sh`) that scans directories for audio files (mp3, m4a, amr, wav), extracts metadata via `exiftool`, and outputs a CSV report. There is no build system.
+This is a single-file bash utility (`create_audio_report_simple.sh`) that scans directories for audio files (mp3, m4a, amr, wav, flac, ogg, opus, aac, wma), extracts metadata via `exiftool`, and outputs a CSV report. There is no build system.
 
 ## Running the Script
 
 ```bash
-./create_audio_report_simple.sh <source_folder> <target_csv_file>
+./create_audio_report_simple.sh [--dry-run] <source_folder> [<target_csv_file>]
 ```
+
+`--dry-run` lists matching files and exits without writing a CSV (target not required).
 
 **Prerequisite:** `exiftool` must be installed (`brew install exiftool` on macOS).
 

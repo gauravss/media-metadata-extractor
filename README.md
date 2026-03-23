@@ -6,6 +6,8 @@ This script extracts metadata from audio files in a specified directory and gene
 
 The `create_audio_report_simple.sh` script scans a source folder for audio files (specifically `mp3`, `m4a`, `amr`, and `wav` formats), extracts their metadata, and organizes it into a CSV file. This is useful for cataloging and managing large collections of audio files.
 
+The script supports the following audio formats: `mp3`, `m4a`, `amr`, `wav`, `flac`, `ogg`, `opus`, `aac`, and `wma`.
+
 The script extracts the following metadata fields:
 
 - File Name
@@ -76,6 +78,7 @@ The script requires two arguments: the path to the source folder containing the 
 ### Options
 
 - `-h`, `--help`: Display a help message with usage instructions and exit.
+- `--dry-run`: Scan the source folder and list matching audio files without extracting metadata or writing a CSV. Useful for previewing a large collection before running a full scan.
 
 ### Examples
 
@@ -93,7 +96,14 @@ The script requires two arguments: the path to the source folder containing the 
    ./create_audio_report_simple.sh "/Volumes/External Drive/My Audio Files" "report.csv"
    ```
 
-3. **Getting Help**:
+3. **Previewing a scan without processing**:
+   To see which files would be processed before running a full extraction:
+
+   ```bash
+   ./create_audio_report_simple.sh --dry-run ~/MyMusic
+   ```
+
+4. **Getting Help**:
    To see the help message with details on how to use the script:
 
    ```bash
