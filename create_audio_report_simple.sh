@@ -62,8 +62,8 @@ else
     md5cmd() { md5sum "$1" | awk '{print $1}'; }
 fi
 
-# Find all audio files and loop through them
-find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" \) | while read -r file; do
+# Find all audio files and loop through them (null-delimited to handle filenames with spaces/newlines)
+while IFS= read -r -d '' file; do
     # Calculate MD5 checksum
     md5_checksum=$(md5cmd "$file")
 
@@ -72,7 +72,7 @@ find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.a
 
     # Combine and write to temp file
     echo "$exiftool_output|$md5_checksum" >> "$temp_file"
-done
+done < <(find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" \) -print0)
 
 # Check if any files were found and processed
 if [ ! -s "$temp_file" ]; then
