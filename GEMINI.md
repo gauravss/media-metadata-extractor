@@ -50,7 +50,7 @@ This command will scan the `~/Music/Podcasts` directory for audio files and crea
 
 The script takes care to generate a well-formatted and robust CSV file:
 
-* **Enclosed Strings**: All string values are enclosed in double quotes (`"`) to ensure that commas or other special characters within the data do not break the CSV structure.
+* **Enclosed Strings**: All text fields are enclosed in double quotes (`"`) to ensure that commas or other special characters within the data do not break the CSV structure. This includes `Duration`.
 * **Double Quote Escaping**: Any double quotes within a text field are escaped by doubling them (e.g., `"` becomes `""`), which is the standard CSV format for handling quotes within fields.
 * **Field Sanitization**: All text fields (`Album`, `Artist`, `Title`, `Genre`, and `Comment`) are sanitized to remove newline (`\n`) and carriage return (`\r`) characters. The sanitization also trims leading/trailing whitespace and collapses multiple internal spaces into a single space, ensuring each record fits on a single line in the CSV.
 * **Character Encoding**: The script explicitly sets the output character encoding to UTF-8 to ensure consistent handling of special characters across different systems.
