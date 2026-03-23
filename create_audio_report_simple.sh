@@ -75,7 +75,10 @@ while IFS= read -r -d '' file; do
     md5_checksum=$(md5cmd "$file")
 
     # Extract metadata with exiftool
-    exiftool_output=$(exiftool -m -charset UTF8 -p '$FileName|$Directory|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$file")
+    if ! exiftool_output=$(exiftool -m -charset UTF8 -p '$FileName|$Directory|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$file" 2>/dev/null); then
+        echo "Warning: skipping '$file' — exiftool failed to read metadata." >&2
+        continue
+    fi
 
     # Combine and write to temp file
     echo "$exiftool_output|$md5_checksum" >> "$temp_file"
