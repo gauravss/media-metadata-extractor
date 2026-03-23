@@ -111,8 +111,12 @@ while IFS= read -r -d '' file; do
     # Calculate MD5 checksum
     md5_checksum=$(md5cmd "$file")
 
+    # Compute relative directory path in bash (avoids regex issues in awk)
+    rel_dir="${file#"$SOURCE_FOLDER"}"
+    rel_dir="${rel_dir%/*}"
+
     # Extract metadata with exiftool
-    if ! exiftool_output=$(exiftool -m -charset UTF8 -p '$FileName|$Directory|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$file" 2>/dev/null); then
+    if ! exiftool_output=$(exiftool -m -charset UTF8 -p '$FileName|'"$rel_dir"'|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$file" 2>/dev/null); then
         echo "Warning: skipping '$file' — exiftool failed to read metadata." >&2
         skipped=$((skipped + 1))
         continue
@@ -130,7 +134,7 @@ if [ ! -s "$temp_file" ]; then
 fi
 
 # Use awk to process the metadata and create the final CSV.
-awk -v source_folder="$SOURCE_FOLDER" \
+awk \
 'function escape(str) {
     gsub(/"/, "\"\"", str)
     return str
@@ -140,9 +144,6 @@ BEGIN {
     print "File Name,File Path,Size (MB),Album,Year,Duration,Artist,Title,Genre,Comment,Checksum";
 }
 {
-    # Make the file path relative to the source folder
-    sub(source_folder, "", $2)
-
     # Album logic
     album = $4
     if (album == "") {
