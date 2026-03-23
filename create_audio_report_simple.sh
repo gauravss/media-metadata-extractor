@@ -47,7 +47,7 @@ fi
 if ! command -v exiftool &> /dev/null
 then
     echo "exiftool could not be found. Please install it first."
-    exit
+    exit 1
 fi
 
 echo "Scanning for audio files in '$SOURCE_FOLDER' and extracting metadata..."
