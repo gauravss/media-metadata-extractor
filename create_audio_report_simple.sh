@@ -54,10 +54,18 @@ echo "Scanning for audio files in '$SOURCE_FOLDER' and extracting metadata..."
 
 temp_file=$(mktemp)
 trap 'rm -f "$temp_file"' EXIT
+
+# Determine md5 command for cross-platform compatibility (macOS vs Linux)
+if command -v md5 &>/dev/null; then
+    md5cmd() { md5 -q "$1"; }
+else
+    md5cmd() { md5sum "$1" | awk '{print $1}'; }
+fi
+
 # Find all audio files and loop through them
 find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" \) | while read -r file; do
     # Calculate MD5 checksum
-    md5_checksum=$(md5 -q "$file")
+    md5_checksum=$(md5cmd "$file")
 
     # Extract metadata with exiftool
     exiftool_output=$(exiftool -m -charset UTF8 -p '$FileName|$Directory|$FileSize#|${Album;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|$Year|$CreateDate|$Duration|${Artist;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Title;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Genre;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}|${Comment;s/[\n\r]/ /g; s/^\s+//; s/\s+$//; s/\s+/ /g}' "$file")
