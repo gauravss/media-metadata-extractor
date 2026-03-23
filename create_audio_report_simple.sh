@@ -53,7 +53,6 @@ fi
 echo "Scanning for audio files in '$SOURCE_FOLDER' and extracting metadata..."
 
 temp_file=$(mktemp)
-temp_file=$(mktemp)
 trap 'rm -f "$temp_file"' EXIT
 # Find all audio files and loop through them
 find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" \) | while read -r file; do
