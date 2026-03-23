@@ -18,7 +18,7 @@ This is a single-file bash utility (`create_audio_report_simple.sh`) that scans 
 
 The script is structured in three sequential phases:
 
-1. **Validation** — checks args, source folder existence, and `exiftool` availability.
+1. **Validation** — checks args, source folder existence, target CSV parent directory existence, and `exiftool` availability.
 2. **Data collection** — uses `find -print0` with a null-delimited `while IFS= read -r -d ''` loop to safely handle filenames with spaces or special characters. For each file, runs `md5cmd` (a shim that selects `md5 -q` on macOS or `md5sum` on Linux) for the checksum, and `exiftool` with a pipe-delimited format string. Sanitization (strip `\n`/`\r`, trim/collapse whitespace) happens inline within the `exiftool -p` format string. Results are appended to a `mktemp` temp file.
 3. **CSV generation** — `awk` reads the pipe-delimited temp file, applies fallback logic (folder name → Album if empty; CreateDate year → Year if tag missing/invalid), converts byte sizes to MB, escapes double quotes by doubling, and writes the final CSV.
 

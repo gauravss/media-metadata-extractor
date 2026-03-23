@@ -43,7 +43,7 @@ This command will scan the `~/Music/Podcasts` directory for audio files and crea
 
 * The script is written in `bash` and should be compatible with standard `bash` environments.
 * The script now loops through each audio file individually to calculate the checksum and extract metadata. This approach is more robust, but may be slower on very large collections.
-* Error handling is included for missing dependencies and incorrect arguments.
+* Error handling is included for missing dependencies, incorrect arguments, and invalid target paths. If `exiftool` fails on a specific file (e.g. corrupt or permission-denied), a warning is printed to `stderr` and the file is skipped — processing continues for all remaining files.
 * A temporary file is used to stage the extracted data before it's processed by `awk`, which is a good practice for managing intermediate data.
 
 ## Data Handling and CSV Generation
