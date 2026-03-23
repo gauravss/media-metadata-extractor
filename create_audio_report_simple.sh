@@ -5,7 +5,7 @@
 
 # Function to display help message
 display_help() {
-    echo "Usage: $0 <source_folder> <target_csv_file>"
+    echo "Usage: $0 [options] <source_folder> <target_csv_file>"
     echo
     echo "This script scans a source folder for audio files (mp3, m4a, amr, wav, flac, ogg, opus, aac, wma), extracts their metadata using exiftool,"
     echo "and generates a CSV file with the collected information."
@@ -16,26 +16,39 @@ display_help() {
     echo
     echo "Options:"
     echo "  -h, --help         Display this help message and exit."
+    echo "  --dry-run          Count and list matching files without extracting metadata or writing a CSV."
     echo
     echo "Dependencies:"
     echo "  This script requires 'exiftool' to be installed and available in your system's PATH."
 }
 
-# Check for help argument
-if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-    display_help
-    exit 0
-fi
+# Parse options
+DRY_RUN=false
+while [[ "$1" == -* ]]; do
+    case "$1" in
+        -h|--help) display_help; exit 0 ;;
+        --dry-run) DRY_RUN=true; shift ;;
+        *) echo "Error: Unknown option '$1'"; echo "Use -h or --help for usage information."; exit 1 ;;
+    esac
+done
 
-# Check for the correct number of arguments
-if [ "$#" -ne 2 ]; then
-    echo "Error: Invalid number of arguments."
-    echo "Use -h or --help for usage information."
-    exit 1
+# Validate positional arguments
+if $DRY_RUN; then
+    if [ "$#" -ne 1 ]; then
+        echo "Error: --dry-run requires exactly one argument: source_folder"
+        echo "Use -h or --help for usage information."
+        exit 1
+    fi
+else
+    if [ "$#" -ne 2 ]; then
+        echo "Error: Invalid number of arguments."
+        echo "Use -h or --help for usage information."
+        exit 1
+    fi
 fi
 
 SOURCE_FOLDER="$1"
-TARGET_CSV="$2"
+TARGET_CSV="${2:-}"
 
 # Check if source folder exists
 if [ ! -d "$SOURCE_FOLDER" ]; then
@@ -43,11 +56,13 @@ if [ ! -d "$SOURCE_FOLDER" ]; then
     exit 1
 fi
 
-# Check if target CSV's parent directory exists
-TARGET_DIR=$(dirname "$TARGET_CSV")
-if [ ! -d "$TARGET_DIR" ]; then
-    echo "Error: Target directory '$TARGET_DIR' does not exist."
-    exit 1
+# Check if target CSV's parent directory exists (not needed for dry-run)
+if ! $DRY_RUN; then
+    TARGET_DIR=$(dirname "$TARGET_CSV")
+    if [ ! -d "$TARGET_DIR" ]; then
+        echo "Error: Target directory '$TARGET_DIR' does not exist."
+        exit 1
+    fi
 fi
 
 # Check if exiftool is installed
@@ -55,6 +70,18 @@ if ! command -v exiftool &> /dev/null
 then
     echo "exiftool could not be found. Please install it first."
     exit 1
+fi
+
+# Dry-run: list matching files and exit
+if $DRY_RUN; then
+    echo "Dry-run mode: scanning '$SOURCE_FOLDER' for audio files..."
+    count=0
+    while IFS= read -r -d '' file; do
+        echo "  $file"
+        count=$((count + 1))
+    done < <(find "$SOURCE_FOLDER" -type f \( -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.amr" -o -iname "*.wav" -o -iname "*.flac" -o -iname "*.ogg" -o -iname "*.opus" -o -iname "*.aac" -o -iname "*.wma" \) -print0)
+    echo "$count file(s) would be processed."
+    exit 0
 fi
 
 echo "Scanning for audio files in '$SOURCE_FOLDER' and extracting metadata..."
