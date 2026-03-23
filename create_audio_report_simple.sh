@@ -43,6 +43,13 @@ if [ ! -d "$SOURCE_FOLDER" ]; then
     exit 1
 fi
 
+# Check if target CSV's parent directory exists
+TARGET_DIR=$(dirname "$TARGET_CSV")
+if [ ! -d "$TARGET_DIR" ]; then
+    echo "Error: Target directory '$TARGET_DIR' does not exist."
+    exit 1
+fi
+
 # Check if exiftool is installed
 if ! command -v exiftool &> /dev/null
 then
