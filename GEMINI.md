@@ -8,10 +8,10 @@ The primary goal of this script is to provide a simple and effective way to cata
 
 ### Key Technologies
 
-* **Shell Scripting (`bash`)**: The core logic is written as a `bash` script, making it portable across Unix-like systems (Linux, macOS).
+* **Shell Scripting (`bash`)**: The core logic is written as a `bash` script, compatible with Unix-like systems (Linux, macOS).
 * **`exiftool`**: This is a critical dependency for reading and extracting metadata from the audio files.
 * **`awk`**: Used for processing the extracted metadata and formatting it into a CSV structure.
-* **`md5`**: Used for calculating the MD5 checksum of each audio file.
+* **`md5` / `md5sum`**: Used for calculating the MD5 checksum of each audio file. The script automatically selects `md5` (macOS) or `md5sum` (Linux) at runtime.
 
 ## Building and Running
 
